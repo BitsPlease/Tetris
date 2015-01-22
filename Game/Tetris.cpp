@@ -434,6 +434,7 @@ void newShape(bool &gameover)
 
 	int c = 15;
 
+
 	switch (type)
 	{
 	case 0:
@@ -467,36 +468,36 @@ void newShape(bool &gameover)
 	{
 		//##
 		// ##
-		shape.push_back(GameObject(x, 0, ShapeSymbol));
-		shape.push_back(GameObject(x + 1, 0, ShapeSymbol));
-		shape.push_back(GameObject(x + 1, 1, ShapeSymbol));
-		shape.push_back(GameObject(x + 2, 1, ShapeSymbol));
+		shape.push_back(GameObject(x, 0, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 1, 0, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 1, 1, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 2, 1, ShapeSymbol, c));
 	}break;
 	case 4:
 	{
 		// ##
 		//##
-		shape.push_back(GameObject(x, 1, ShapeSymbol));
-		shape.push_back(GameObject(x + 1, 1, ShapeSymbol));
-		shape.push_back(GameObject(x + 1, 0, ShapeSymbol));
-		shape.push_back(GameObject(x + 2, 0, ShapeSymbol));
+		shape.push_back(GameObject(x, 1, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 1, 1, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 1, 0, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 2, 0, ShapeSymbol, c));
 	}break;
 	case 5:
 	{
 		//####
-		shape.push_back(GameObject(x, 0, ShapeSymbol));
-		shape.push_back(GameObject(x + 1, 0, ShapeSymbol));
-		shape.push_back(GameObject(x + 2, 0, ShapeSymbol));
-		shape.push_back(GameObject(x + 3, 0, ShapeSymbol));
+		shape.push_back(GameObject(x, 0, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 1, 0, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 2, 0, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 3, 0, ShapeSymbol, c));
 	}break;
 	case 6:
 	{
 		// #
 		//###
-		shape.push_back(GameObject(x, 1, ShapeSymbol));
-		shape.push_back(GameObject(x + 1, 0, ShapeSymbol));
-		shape.push_back(GameObject(x + 1, 1, ShapeSymbol));
-		shape.push_back(GameObject(x + 2, 1, ShapeSymbol));
+		shape.push_back(GameObject(x, 1, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 1, 0, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 1, 1, ShapeSymbol, c));
+		shape.push_back(GameObject(x + 2, 1, ShapeSymbol, c));
 	}break;
 	}
 	// Add it to the list, set it as active
@@ -515,6 +516,7 @@ void Rotate()
 	vector<GameObject>::iterator it;
 	int CorX[4];
 	int CorY[4];
+	int c = 15;
 	int arr[4][4] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	int arrRot[4][4] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	int i = 0;
@@ -522,6 +524,7 @@ void Rotate()
 	int minRotX = 1000;
 	for (it = Shape.begin(); it < Shape.end(); it++, i++)
 	{
+		c = it->Color;
 		CorX[i] = it->Coordinates.X;
 		CorY[i] = it->Coordinates.Y;
 		if (minY > CorY[i])
@@ -579,7 +582,7 @@ void Rotate()
 		{
 			if (arrNewRot[i][j] == 1)
 			{
-				newshape.push_back(GameObject(minX + j, minY + i, ShapeSymbol));
+				newshape.push_back(GameObject(minX + j, minY + i, ShapeSymbol, c));
 			}
 		}
 	}
@@ -644,7 +647,7 @@ void DelFullRow(int row)
 		}
 	}
 
-	for (int i = row - 1; i > 0; i--)
+	/*for (int i = row - 1; i > 0; i--)
 	{
 		for (int j = 0; j < WindowWidth; j++)
 		{
@@ -657,11 +660,24 @@ void DelFullRow(int row)
 				}
 			}
 		}
-	}
+	}*/
 
 	for (int i = max - 1; i >= 0; i--)
 	{
 		shapes.push_back(vshapes[i]);
+	}
+
+	typedef vector<vector<GameObject>>::const_iterator it;
+	// Since the active shape is always the last, loop until before the active shape, otherwise we'll detect false collision
+	for (vector<vector<GameObject>>::iterator shape = shapes.begin(); shape != shapes.end(); ++shape)
+	{
+		for (randomAccess_iterator shapePoint = shape->begin(); shapePoint != shape->end(); ++shapePoint)
+		{
+			if (shapePoint->Coordinates.Y < row && shapePoint->Symbol == ShapeSymbol)
+			{
+				shapePoint->Coordinates.Y += 1;
+			}
+		}
 	}
 }
 
