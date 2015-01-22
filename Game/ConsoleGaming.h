@@ -14,11 +14,29 @@ private:
 public: 
 	COORD Coordinates;
 	char Symbol;
-	ConsoleColor Color;
+	ConsoleColor Color = DefaultColor;
+	
+	friend bool operator== (const GameObject &a, const GameObject &b)
+	{
+		bool same = false;
+		same = a.Coordinates.X == b.Coordinates.X && a.Coordinates.Y == b.Coordinates.Y && a.Symbol == b.Symbol;
+		return same;
+	}
+	
+	GameObject::GameObject(COORD coordinates, char symbol, int color) :
+		Coordinates(coordinates), Symbol(symbol), Color(color)
+	{   }
 
 	GameObject::GameObject(COORD coordinates, char symbol) :
 		Coordinates(coordinates), Symbol(symbol), Color(DefaultColor)
 	{	}
+	
+	GameObject::GameObject(int x, int y, char symbol, int color) :
+		Symbol(symbol), Color(color)
+	{
+		COORD coordinates = { x, y };
+		this->Coordinates = coordinates;
+	}
 
 	GameObject::GameObject(int x, int y, char symbol) :
 		Symbol(symbol), Color(DefaultColor)
@@ -28,7 +46,7 @@ public:
 	}
 
 	GameObject::GameObject(const GameObject& gameObject) :
-		Coordinates(gameObject.Coordinates), Symbol(gameObject.Symbol), Color(DefaultColor)
+		Coordinates(gameObject.Coordinates), Symbol(gameObject.Symbol), Color(gameObject.Color)
 	{	}
 
 	void GameObject::UpdateCoordinates(const COORD& value)
