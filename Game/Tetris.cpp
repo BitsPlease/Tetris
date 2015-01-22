@@ -459,7 +459,190 @@ void Rotate()
         }
 }
  
-
+void DelFullRow(int row)
+{
+        vector<vector<GameObject>> shapescopy = shapes;
+ 
+        int max = shapes.size();
+ 
+        int br = 0;
+ 
+        vector<GameObject> *vshapes = new vector<GameObject>[shapes.size()];
+ 
+        for (int i = 0; i < max; i++)
+        {
+                vshapes[i] = shapes.back();
+                shapes.pop_back();
+        }
+ 
+        for (int j = 0; j < WindowWidth; j++)
+        {
+                for (int k = 0; k < max; k++)
+                {
+                        if (find(vshapes[k].begin(), vshapes[k].end(), GameObject(j, row, ShapeSymbol)) != vshapes[k].end())
+                        {
+                                vshapes[k].erase(find(vshapes[k].begin(), vshapes[k].end(), GameObject(j, row, ShapeSymbol)));
+                        }
+                }
+        }
+ 
+        for (int i = row - 1; i > 0; i--)
+        {
+                for (int j = 0; j < WindowWidth; j++)
+                {
+                        for (int k = 0; k < max; k++)
+                        {
+ 
+                                if (find(vshapes[k].begin(), vshapes[k].end(), GameObject(j, i, ShapeSymbol)) != vshapes[k].end())
+                                {
+                                        replace(vshapes[k].begin(), vshapes[k].end(), GameObject(j, i, ShapeSymbol), GameObject(j, i + 1, ShapeSymbol));
+                                }
+                        }
+                }
+        }
+ 
+        for (int i = max - 1; i >= 0; i--)
+        {
+                shapes.push_back(vshapes[i]);
+        }
+}
+ 
+void FullRows()
+{
+        bool NoMoreFullRows = false;
+        int brscore = 0;
+        while (!NoMoreFullRows)
+        {
+                vector<vector<GameObject>> shapescopy = shapes;
+ 
+                int max = shapes.size();
+ 
+                int br = 0;
+ 
+                vector<GameObject> *vshapes = new vector<GameObject>[shapes.size()];
+ 
+                for (int i = 0; i < max; i++)
+                {
+                        vshapes[i] = shapescopy.back();
+                        shapescopy.pop_back();
+                }
+ 
+                int row = WindowHeight - 2;
+                for (row = WindowHeight - 2; row > 0; row--)
+                {
+                        br = 0;
+                        for (int j = 0; j < WindowWidth; j++)
+                        {
+                                for (int k = 0; k < max; k++)
+                                {
+                                        if (find(vshapes[k].begin(), vshapes[k].end(), GameObject(j, row, ShapeSymbol)) != vshapes[k].end())
+                                        {
+                                                br++;
+                                        }
+                                }
+                        }
+                        if (br == WindowWidth) break;
+                }
+                if (br == WindowWidth)
+                {
+                        brscore++;
+                        DelFullRow(row);
+                }
+                else
+                {
+                        NoMoreFullRows = true;
+                }
+        }
+ 
+        switch (brscore)
+        {
+        case 1: score += 200; break;
+        case 2: score += 500; break;
+        case 3: score += 800; break;
+        case 4: score += 1200; break;
+        }
+}
+ 
+void GhostShape()
+{
+        bool hasReachedFloor = false;
+        vector<GameObject> savevector = shapes.back();
+        vector<GameObject> ghost = shapes.back();
+        shapes.pop_back();
+        shapes.push_back(ghost);
+ 
+        while (!hasReachedFloor)
+        {
+                vector<vector<GameObject>>::iterator activeShape = shapes.end() - 1;
+ 
+                for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+                {
+                        shapeNode->Coordinates.Y += ShapeSpeed;
+                        shapeNode->Symbol = GhostSymbol;
+ 
+                        // Loop trough all shapes, check if we are colliding. If that's the case, the shape has reached its destination, leave it there and generate a new shape
+                        typedef vector<vector<GameObject>>::const_iterator it;
+                        // Since the active shape is always the last, loop until before the active shape, otherwise we'll detect false collision
+                        for (it shape = shapes.begin(); shape != shapes.end() - 1; ++shape)
+                        {
+                                for (const_iterator shapePoint = shape->begin(); shapePoint != shape->end(); ++shapePoint)
+                                {
+                                        if (shapePoint->Coordinates.X == shapeNode->Coordinates.X && shapePoint->Coordinates.Y == shapeNode->Coordinates.Y)
+                                        {
+                                                hasReachedFloor = true;
+                                                //break;
+                                        }
+                                }
+                                // This might go in the loop condition, but I believe it's much clear here
+                                //if (hasReachedFloor)
+                                //break;
+                        }
+                }
+ 
+        }
+ 
+        vector<vector<GameObject>>::iterator activeShape = shapes.end() - 1;
+ 
+        if (hasReachedFloor)
+        {
+                // Return the coordinates to how they were
+                for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+                {
+                        shapeNode->Coordinates.Y -= ShapeSpeed;
+                }
+        }
+        ghost = shapes.back();
+        shapes.pop_back();
+        shapes.push_back(ghost);
+        shapes.push_back(savevector);
+        if (last2shapes.empty())
+        {
+                last2shapes.push_back(ghost);
+                last2shapes.push_back(savevector);
+        }
+}
+ 
+void ToGround(bool &gameover)
+{
+        GhostShape();
+        shapes.pop_back();
+ 
+        vector<vector<GameObject>>::iterator activeShape = shapes.end() - 1;
+ 
+        for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+        {
+                shapeNode->Symbol = ShapeSymbol;
+        }
+        FullRows();
+        newShape(gameover);
+        GhostShape();
+        vector<GameObject> last = shapes.back();
+        shapes.pop_back();
+        shapes.pop_back();
+        shapes.push_back(last);
+        fullrefresh = true;
+ 
+}
 
 void Update()
 {
