@@ -1,6 +1,6 @@
 #include "ConsoleGaming.h"
 
-ConsoleColor GameObject::BackgroundColor = 0x00;
+ConsoleColor GameObject::BackgroundColor = 16 * 2;
 
 void ClearScreen(HANDLE consoleHandle)
 {
