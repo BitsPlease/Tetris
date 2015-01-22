@@ -154,18 +154,18 @@ void Menu(){//start menu
                         instr.drawblack();
                         start.drawblack();
                         exit.drawblack();
-                        SetConsoleCursorPosition(consoleHandle, { 9, 8 });//za pritnvane posredata
+                        SetConsoleCursorPosition(consoleHandle, { 9, 5 });//za pritnvane posredata
  
  
                         cout << "Controls:" << endl;
-                        SetConsoleCursorPosition(consoleHandle, { 9, 9 });
+                        SetConsoleCursorPosition(consoleHandle, { 5, 8 });
                         cout << "Use A and D to move." << endl;
-                        SetConsoleCursorPosition(consoleHandle, { 9, 10 });
-                       	cout << "Use S to drop." << endl;
-                       	SetConsoleCursorPosition(consoleHandle, { 9, 11 });
-                       	cout << "Use SPACEBAR to rotate." << endl;
-                       	SetConsoleCursorPosition(consoleHandle, { 9, 13 });
-                       	cout << " M - Toggle Sound"<< endl;
+                        SetConsoleCursorPosition(consoleHandle, { 5, 9 });
+                        cout << "Use S to drop." << endl;
+                        SetConsoleCursorPosition(consoleHandle, { 5, 10 });
+                        cout << "Use SPACEBAR to rotate." << endl;
+                        SetConsoleCursorPosition(consoleHandle, { 5, 12 });
+                        cout << " M - Toggle Sound" << endl;
                         back.set_values(150, 170, 200, 190, L"Back");
                         back.draw();
                         HDC hdc = GetDC(GetConsoleWindow());//magiq
