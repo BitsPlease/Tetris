@@ -159,9 +159,13 @@ void Menu(){//start menu
  
                         cout << "Controls:" << endl;
                         SetConsoleCursorPosition(consoleHandle, { 9, 9 });
-                        cout << "Use 'a' and 'd' to move the figure sideways." << endl
-                       	<< "'s' pushes it to the floor. Press 'Spacebar' to change orientation" << endl
-                       	<< endl << " M - Toggle Sound On/Off"<< endl;
+                        cout << "Use 'a' and 'd' to move the figure sideways." << endl;
+                        SetConsoleCursorPosition(consoleHandle, { 9, 10 });
+                       	cout << "'s' pushes it to the floor." << endl;
+                       	SetConsoleCursorPosition(consoleHandle, { 9, 11 });
+                       	cout << "Press 'Spacebar' to change orientation" << endl;
+                       	SetConsoleCursorPosition(consoleHandle, { 9, 13 });
+                       	cout << " M - Toggle Sound"<< endl;
                         back.set_values(150, 170, 200, 190, L"Back");
                         back.draw();
                         HDC hdc = GetDC(GetConsoleWindow());//magiq
