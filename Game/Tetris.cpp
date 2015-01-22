@@ -1,10 +1,17 @@
 #include <iostream>
+#include <iomanip>
 #include <vector>
-#include <iostream>
+#include <stdio.h>
 #include <conio.h>
+#include <cstdlib>
+#include <string>
 #include <time.h>
+#include <algorithm>
+#include <fstream>
+#include <Windows.h>
 
 #include "ConsoleGaming.h"
+#include "Menu.h"
 
 using namespace std;
 
@@ -840,52 +847,125 @@ void UpdateNoDown(bool &gameover)
         }
 }
  
-
 void Draw()
 {
-	ClearScreen(consoleHandle);
-
-	typedef vector<vector<GameObject>>::const_iterator it;
-	for (it shape = shapes.begin(); shape != shapes.end(); ++shape)
-	{
-		for (const_iterator shapeNode = shape->begin(); shapeNode != shape->end(); ++shapeNode)
-		{
-			shapeNode->Draw(consoleHandle);
-		}
-	}
+        GhostShape();
+        ClearScreen(consoleHandle);
+        typedef vector<vector<GameObject>>::const_iterator it;
+        for (it shape = shapes.begin(); shape != shapes.end(); ++shape)
+        {
+                for (const_iterator shapeNode = shape->begin(); shapeNode != shape->end(); ++shapeNode)
+                {
+                        shapeNode->Draw(consoleHandle);
+                }
+        }
+        vector<GameObject> last = shapes.back();
+        shapes.pop_back();
+        last2shapes.push_back(shapes.back());
+        shapes.pop_back();
+        shapes.push_back(last);
+        last2shapes.push_back(last);
+        fullrefresh = false;
+}
+ 
+void DrawNoDel()
+{
+        GhostShape();
+        typedef vector<vector<GameObject>>::iterator it;
+        for (it shape = last2shapes.end() - 2; shape != last2shapes.end(); ++shape)
+        {
+                for (randomAccess_iterator shapeNode = shape->begin(); shapeNode != shape->end(); ++shapeNode)
+                {
+                        shapeNode->Symbol = ' ';
+                        shapeNode->Draw(consoleHandle);
+                }
+        }
+        last2shapes.pop_back();
+        last2shapes.pop_back();
+ 
+        typedef vector<vector<GameObject>>::const_iterator it2;
+        for (it2 shape = shapes.end() - 2; shape != shapes.end(); ++shape)
+        {
+                for (const_iterator shapeNode = shape->begin(); shapeNode != shape->end(); ++shapeNode)
+                {
+                        shapeNode->Draw(consoleHandle);
+                }
+        }
+        vector<GameObject> last = shapes.back();
+        shapes.pop_back();
+        last2shapes.push_back(shapes.back());
+        shapes.pop_back();
+        shapes.push_back(last);
+        last2shapes.push_back(last);
+}
+ 
+void ScoreBoardUpdate(string name, int score)
+{
+        string* lines = new string[10];
+        string* newscoreboard = new string[10];
+        string test;
+        int line = 0;
+        int newline = 0;
+        bool added = false;
+        ifstream read("Scoreboard.txt");
+        if (read.is_open())
+        {
+                while (!read.eof())
+                {
+                        getline(read, lines[line]);
+                        line++;
+                }
+                read.close();
+        }
+        if (line == 0)
+        {
+                ofstream write("Scoreboard.txt");
+                write << name << ";" << score;
+                write.close();
+        }
+        else
+        {
+                for (int i = 0; i < line; i++)
+                {
+                        int pos = lines[i].find(";");
+                        if (pos >= 1)
+                        {
+                                if (!added)
+                                {
+                                        if (score>stoi(lines[i].substr(pos + 1)))
+                                        {
+                                                newscoreboard[newline] = name + ";" + to_string(score);
+                                                newline++;
+                                                added = true;
+                                        }
+                                }
+                                newscoreboard[newline] = lines[i];
+                                newline++;
+                        }
+                }
+                if (!added && line < 6)
+                {
+                        newscoreboard[newline] = name + ";" + to_string(score);
+                        newline++;
+                        added = true;
+                }
+                int all = 5;
+                if (line < 5)
+                {
+                        all = line;
+                        if (added) all++;
+                }
+                ofstream write("Scoreboard.txt");
+                for (int i = 0; i < all; i++)
+                {
+                        write << newscoreboard[i] << endl;
+                }
+                write.close();
+        }
 }
 
 int main()
 {
-	consoleHandle = GetStdHandle( STD_OUTPUT_HANDLE );
-	// Prepare rand
-	srand(time(NULL));
 	
-	// Create the floor
-	vector<GameObject> floor;
-	for (int i = 0; i < WindowWidth - 1; i++)
-	{
-		floor.push_back(GameObject(i, WindowHeight - 1, ShapeSymbol));
-	}
-	shapes.push_back(floor);
-
-
-	// Create the first active shape
-	vector<GameObject> shape;
-	int x = rand() % WindowWidth;
-	shape.push_back(GameObject(x, 0, ShapeSymbol));
-	shape.push_back(GameObject(x, 1, ShapeSymbol));
-	shape.push_back(GameObject(x + 1, 0, ShapeSymbol));
-	shape.push_back(GameObject(x + 1, 1, ShapeSymbol));
-	// Add it to the list, setting it as active
-	shapes.push_back(shape);
-
-	while (true)
-	{
-		Update();
-		Draw();
-		Sleep(sleepDuration);
-	}
-
 	return 0;
 }
