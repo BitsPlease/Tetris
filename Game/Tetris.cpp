@@ -643,71 +643,203 @@ void ToGround(bool &gameover)
         fullrefresh = true;
  
 }
-
-void Update()
+ 
+void Update(bool &gameover)
 {
-	COORD direction = { 0, 0 };
-
-	if (kbhit())
-	{
-		char key = getch();
-		switch (key)
-		{
-		case 'a':
-			direction.X = -1;
-			break;
-		case 'd':
-			direction.X = 1;
-			break;
-		};
-	}
-
-	bool hasReachedFloor = false;
-	vector<vector<GameObject>>::iterator activeShape = shapes.end() - 1;
-	for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
-	{
-		shapeNode->Coordinates.X += direction.X;
-		shapeNode->Coordinates.Y += ShapeSpeed;
-
-		// Loop trough all shapes, check if we are colliding. If that's the case, the shape has reached its destination, leave it there and generate a new shape
-		typedef vector<vector<GameObject>>::const_iterator it;
-		// Since the active shape is always the last, loop until before the active shape, otherwise we'll detect false collision
-		for (it shape = shapes.begin(); shape != shapes.end() - 1; ++shape)
-		{
-			for (const_iterator shapePoint = shape->begin(); shapePoint != shape->end(); ++shapePoint)
-			{
-				if (shapePoint->Coordinates.X == shapeNode->Coordinates.X && shapePoint->Coordinates.Y == shapeNode->Coordinates.Y)
-				{
-					hasReachedFloor = true;
-					break;
-				}
-			}
-			// This might go in the loop condition, but I believe it's much clear here
-			if (hasReachedFloor)
-				break;
-		}
-	}
-
-	// Generate a new shape
-	if (hasReachedFloor)
-	{
-		// Return the coordinates to how they were
-		for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
-		{
-			shapeNode->Coordinates.X -= direction.X;
-			shapeNode->Coordinates.Y -= ShapeSpeed;
-		}
-		
-		vector<GameObject> shape;
-		int x = rand() % WindowWidth;
-		shape.push_back(GameObject(x, 0, ShapeSymbol));
-		shape.push_back(GameObject(x, 1, ShapeSymbol));
-		shape.push_back(GameObject(x + 1, 0, ShapeSymbol));
-		shape.push_back(GameObject(x + 1, 1, ShapeSymbol));
-		// Add it to the list, set it as active
-		shapes.push_back(shape);
-	}
+        COORD direction = { 0, 0 };
+ 
+        char key = '1';
+ 
+        while (kbhit())
+        {
+                key = getch();
+        }
+ 
+        switch (key)
+        {
+        case 'a':
+                direction.X = -1;
+                break;
+        case 'd':
+                direction.X = 1;
+                break;
+        case ' ':
+                Rotate();
+                break;
+        case 's':
+                ToGround(gameover);
+                break;
+        case 'm':
+                if (soundplay)
+                {
+                        PlaySound(NULL, 0, 0);
+                        soundplay = false;
+                }
+                else
+                {
+                        PlaySound(TEXT("TetrisTheme.wav"), NULL, SND_ASYNC | SND_LOOP | SND_NODEFAULT);
+                        soundplay = true;
+                }
+                break;
+        };
+ 
+        bool IsInside = true;
+        vector<vector<GameObject>>::iterator activeShape = shapes.end() - 1;
+ 
+        for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+        {
+                shapeNode->Coordinates.X += direction.X;
+                shapeNode->Coordinates.Y += ShapeSpeed;
+ 
+                if (shapeNode->Coordinates.X < 0 || shapeNode->Coordinates.X >= WindowWidth)
+                {
+                        IsInside = false;
+                }
+        }
+ 
+        for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+        {
+                shapeNode->Coordinates.X -= direction.X;
+                shapeNode->Coordinates.Y -= ShapeSpeed;
+        }
+ 
+        if (!IsInside)
+        {
+                direction = { 0, 0 };
+        }
+ 
+        if (!FalseCollision(direction))
+        {
+                activeShape = shapes.end() - 1;
+ 
+                for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+                {
+                        shapeNode->Coordinates.X += direction.X;
+                }
+        }
+ 
+        bool hasReachedFloor = false;
+        activeShape = shapes.end() - 1;
+ 
+        for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+        {
+                shapeNode->Coordinates.Y += ShapeSpeed;
+ 
+ 
+ 
+                // Loop trough all shapes, check if we are colliding. If that's the case, the shape has reached its destination, leave it there and generate a new shape
+                typedef vector<vector<GameObject>>::const_iterator it;
+                // Since the active shape is always the last, loop until before the active shape, otherwise we'll detect false collision
+                for (it shape = shapes.begin(); shape != shapes.end() - 1; ++shape)
+                {
+                        for (const_iterator shapePoint = shape->begin(); shapePoint != shape->end(); ++shapePoint)
+                        {
+                                if (shapePoint->Coordinates.X == shapeNode->Coordinates.X && shapePoint->Coordinates.Y == shapeNode->Coordinates.Y)
+                                {
+                                        hasReachedFloor = true;
+                                        break;
+                                }
+                        }
+                        // This might go in the loop condition, but I believe it's much clear here
+                        if (hasReachedFloor)
+                                break;
+                }
+        }
+ 
+        // Generate a new shape
+        if (hasReachedFloor)
+        {
+                // Return the coordinates to how they were
+                for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+                {
+                        shapeNode->Coordinates.Y -= ShapeSpeed;
+                }
+                FullRows();
+                newShape(gameover);
+                GhostShape();
+                vector<GameObject> last = shapes.back();
+                shapes.pop_back();
+                shapes.pop_back();
+                shapes.push_back(last);
+                fullrefresh = true;
+        }
 }
+ 
+void UpdateNoDown(bool &gameover)  
+{
+        COORD direction = { 0, 0 };
+ 
+        char key = '1';
+ 
+        while (kbhit())
+        {
+                key = getch();
+        }
+ 
+        switch (key)
+        {
+        case 'a':
+                direction.X = -1;
+                break;
+        case 'd':
+                direction.X = 1;
+                break;
+        case ' ':
+                Rotate();
+                break;
+        case 's':
+                ToGround(gameover);
+                break;
+        case 'm':
+                if (soundplay)
+                {
+                        PlaySound(NULL, 0, 0);
+                        soundplay = false;
+                }
+                else
+                {
+                        PlaySound(TEXT("TetrisTheme.wav"), NULL, SND_ASYNC | SND_LOOP | SND_NODEFAULT);
+                        soundplay = true;
+                }
+                break;
+        };
+ 
+        bool IsInside = true;
+        vector<vector<GameObject>>::iterator activeShape = shapes.end() - 1;
+ 
+        for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+        {
+                shapeNode->Coordinates.X += direction.X;
+                shapeNode->Coordinates.Y += ShapeSpeed;
+ 
+                if (shapeNode->Coordinates.X < 0 || shapeNode->Coordinates.X >= WindowWidth)
+                {
+                        IsInside = false;
+                }
+        }
+ 
+        for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+        {
+                shapeNode->Coordinates.X -= direction.X;
+                shapeNode->Coordinates.Y -= ShapeSpeed;
+        }
+ 
+        if (!IsInside)
+        {
+                direction = { 0, 0 };
+        }
+ 
+        if (!FalseCollision(direction))
+        {
+                activeShape = shapes.end() - 1;
+ 
+                for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+                {
+                        shapeNode->Coordinates.X += direction.X;
+                }
+        }
+}
+ 
 
 void Draw()
 {
