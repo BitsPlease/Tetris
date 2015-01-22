@@ -964,8 +964,102 @@ void ScoreBoardUpdate(string name, int score)
         }
 }
 
+void core(){//core izpulqnva funkciq na main koito shte bude izvikvan ot pause menu-to
+
+	Menu();
+	drawPause();
+	bool gameover = false;
+	consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	// Prepare rand
+	srand(time(NULL));
+
+	PlaySound(TEXT("TetrisTheme.wav"), NULL, SND_ASYNC | SND_LOOP | SND_NODEFAULT);
+	soundplay = true;
+
+	vector<GameObject> floor;
+	for (int i = 0; i < WindowWidth; i++)
+	{
+		floor.push_back(GameObject(i, WindowHeight - 1, FloorSymbol));
+	}
+
+	shapes.push_back(floor);
+
+	vector<GameObject> wall;
+	for (int i = 0; i < WindowHeight - 1; i++)
+	{
+		wall.push_back(GameObject(WindowWidth, i, '|'));
+	}
+
+	shapes.push_back(wall);
+
+	newShape(gameover);
+
+	Draw();
+	Draw();
+
+	clock_t lastTime = clock(); //Start timer
+	clock_t newTime;
+	clock_t timePassed;
+	double secondsPassed;
+	double timeForUpdate = sleepDuration / 1000.0;
+
+	while (!gameover)
+	{
+		Sleep(1);//namalq cpu usage s 25% procenta lelz
+		drawPause();
+		/*Update(gameover);
+		Draw();
+		Sleep(sleepDuration);*/
+
+		newTime = clock();
+		timePassed = newTime - lastTime;
+		secondsPassed = timePassed / (double)CLOCKS_PER_SEC;
+
+		if (secondsPassed >= timeForUpdate)
+		{
+			lastTime = newTime;
+			Update(gameover);
+
+			if (fullrefresh)
+			{
+				Draw();
+			}
+			else
+			{
+				DrawNoDel();
+			}
+		}
+
+		if (kbhit())
+		{
+			UpdateNoDown(gameover);
+			if (fullrefresh)
+			{
+				Draw();
+			}
+			else
+			{
+				DrawNoDel();
+			}
+		}
+	}
+
+	if (gameover)
+	{
+		ClearScreen(consoleHandle);
+		sadface();
+		gameovertxt();
+		cin.get();
+	}
+}
+
 int main()
 {
-	
+
+	adjust_window();
+	Sleep(200);//malko po4ivka za da narisuva grafikata
+	core();
+
+
 	return 0;
 }
