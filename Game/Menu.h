@@ -533,21 +533,16 @@ void gameovertxt(){
 - 102 }, { 57, -102 }, { 58, -102 }, { 59, -102 }, { 60, -102 } };
 HPEN pen = CreatePen(PS_SOLID, 0.5, RGB(100, 0, 0));
 SelectObject(mydc, pen);
-for (int i = 0; i <1209; i++)
-{
-	SetPixel(mydc, ja[i].x -25, ja[i].y + 110, COLOR);
+for (int i = 0; i < 1210; i++)
+	{
+		for (int j = 0; j < 5; j++){
+			SetPixel(mydc, ja[i].x - j - 25, ja[i].y + 110 + j, COLOR);
+		}
+		for (int j = 0; j < 4; j++){
+			SetPixel(mydc, ja[i].x - j - 25, ja[i].y + 110, COLOR);
+		}
 
-	if ((abs(ja[i ].x - 25) - abs(ja[i+1].x - 25) )> 20){
-		MoveToEx(mydc, ja[i].x - 25, ja[i].y + 110, NULL);
-		LineTo(mydc, ja[i + 1].x - 25, ja[i + 1].y + 110);
-		Sleep(10);
 	}
-	
-
-
-}
-
-
 }
 
 void sadface(){
