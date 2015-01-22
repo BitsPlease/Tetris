@@ -228,12 +228,237 @@ void drawPause(){
  
                 }
         }
- 
- 
- 
- 
 }
-
+ 
+bool FalseCollision(COORD dir)
+{
+        bool falseCol = false;
+ 
+        vector<vector<GameObject>>::iterator activeShape = shapes.end() - 1;
+ 
+        for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+        {
+                shapeNode->Coordinates.X += dir.X;
+ 
+                // Loop trough all shapes, check if we are colliding. If that's the case, the shape has reached its destination, leave it there and generate a new shape
+                typedef vector<vector<GameObject>>::const_iterator it;
+                // Since the active shape is always the last, loop until before the active shape, otherwise we'll detect false collision
+                for (it shape = shapes.begin(); shape != shapes.end() - 1; ++shape)
+                {
+                        for (const_iterator shapePoint = shape->begin(); shapePoint != shape->end(); ++shapePoint)
+                        {
+                                if (shapePoint->Coordinates.X == shapeNode->Coordinates.X && shapePoint->Coordinates.Y == shapeNode->Coordinates.Y)
+                                {
+                                        falseCol = true;
+                                        break;
+                                }
+                        }
+                        // This might go in the loop condition, but I believe it's much clear here
+                        if (falseCol)
+                                break;
+                }
+        }
+ 
+        // Return the coordinates to how they were
+        for (randomAccess_iterator shapeNode = activeShape->begin(); shapeNode != activeShape->end(); ++shapeNode)
+        {
+                shapeNode->Coordinates.X -= dir.X;
+        }
+ 
+        return falseCol;
+}
+ 
+void newShape(bool &gameover)
+{
+        vector<GameObject> shape;
+        int x = (WindowWidth - 4) / 2;
+        int type = rand() % 7;
+ 
+        int c = 15;
+ 
+        switch (type)
+        {
+        case 0:
+        {
+                //#
+                //###
+                shape.push_back(GameObject(x, 0, ShapeSymbol, c));
+                shape.push_back(GameObject(x, 1, ShapeSymbol, c));
+                shape.push_back(GameObject(x + 1, 1, ShapeSymbol, c));
+                shape.push_back(GameObject(x + 2, 1, ShapeSymbol, c));
+        }break;
+        case 1:
+        {
+                //  #
+                //###
+                shape.push_back(GameObject(x, 1, ShapeSymbol, c));
+                shape.push_back(GameObject(x + 1, 1, ShapeSymbol, c));
+                shape.push_back(GameObject(x + 2, 0, ShapeSymbol, c));
+                shape.push_back(GameObject(x + 2, 1, ShapeSymbol, c));
+        }break;
+        case 2:
+        {
+                //##
+                //##
+                shape.push_back(GameObject(x, 0, ShapeSymbol, c));
+                shape.push_back(GameObject(x, 1, ShapeSymbol, c));
+                shape.push_back(GameObject(x + 1, 0, ShapeSymbol, c));
+                shape.push_back(GameObject(x + 1, 1, ShapeSymbol, c));
+        }break;
+        case 3:
+        {
+                //##
+                // ##
+                shape.push_back(GameObject(x, 0, ShapeSymbol));
+                shape.push_back(GameObject(x + 1, 0, ShapeSymbol));
+                shape.push_back(GameObject(x + 1, 1, ShapeSymbol));
+                shape.push_back(GameObject(x + 2, 1, ShapeSymbol));
+        }break;
+        case 4:
+        {
+                // ##
+                //##
+                shape.push_back(GameObject(x, 1, ShapeSymbol));
+                shape.push_back(GameObject(x + 1, 1, ShapeSymbol));
+                shape.push_back(GameObject(x + 1, 0, ShapeSymbol));
+                shape.push_back(GameObject(x + 2, 0, ShapeSymbol));
+        }break;
+        case 5:
+        {
+                //####
+                shape.push_back(GameObject(x, 0, ShapeSymbol));
+                shape.push_back(GameObject(x + 1, 0, ShapeSymbol));
+                shape.push_back(GameObject(x + 2, 0, ShapeSymbol));
+                shape.push_back(GameObject(x + 3, 0, ShapeSymbol));
+        }break;
+        case 6:
+        {
+                // #
+                //###
+                shape.push_back(GameObject(x, 1, ShapeSymbol));
+                shape.push_back(GameObject(x + 1, 0, ShapeSymbol));
+                shape.push_back(GameObject(x + 1, 1, ShapeSymbol));
+                shape.push_back(GameObject(x + 2, 1, ShapeSymbol));
+        }break;
+        }
+        // Add it to the list, set it as active
+        shapes.push_back(shape);
+        COORD direction = { 0, 0 };
+        direction.X = 0;
+        if (FalseCollision(direction))
+        {
+                gameover = true;
+        }
+}
+ 
+void Rotate()
+{
+        vector<GameObject> Shape = shapes.at(shapes.size() - 1);
+        vector<GameObject>::iterator it;
+        int CorX[4];
+        int CorY[4];
+        int arr[4][4] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        int arrRot[4][4] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        int i = 0;
+        int minY = 1000, minXonY = 1000, minX = 100, minYpos;
+        int minRotX = 1000;
+        for (it = Shape.begin(); it < Shape.end(); it++, i++)
+        {
+                CorX[i] = it->Coordinates.X;
+                CorY[i] = it->Coordinates.Y;
+                if (minY > CorY[i])
+                {
+                        minY = CorY[i];
+                        minYpos = i;
+                }
+                if (minX > CorX[i])
+                {
+                        minX = CorX[i];
+                }
+        }
+        for (i = 0; i < 4; i++)
+        {
+                if (minY == CorY[i] && minXonY > CorX[i])
+                {
+                        minXonY = CorX[i];
+                }
+        }
+        for (int i = 0; i < 4; i++)
+        {
+                arr[CorY[i] - minY][CorX[i] - minX] = 1;
+        }
+        for (i = 0; i < 4; i++)
+        {
+                for (int j = 0; j < 4; j++)
+                {
+                        arrRot[j][3 - i] = arr[i][j];
+                        if (arrRot[j][3 - i] == 1)
+                        {
+                                if (minRotX > 3 - i)
+                                {
+                                        minRotX = 3 - i;
+                                }
+                        }
+                }
+        }
+        int arrNewRot[4][4] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        for (i = 0; i < 4; i++)
+        {
+                for (int j = 0; j < 4; j++)
+                {
+                        if (j >= minRotX)
+                        {
+                                arrNewRot[i][j - minRotX] = arrRot[i][j];
+                        }
+                }
+        }
+ 
+        vector<GameObject> newshape;
+ 
+        for (i = 0; i < 4; i++)
+        {
+                for (int j = 0; j < 4; j++)
+                {
+                        if (arrNewRot[i][j] == 1)
+                        {
+                                newshape.push_back(GameObject(minX + j, minY + i, ShapeSymbol));
+                        }
+                }
+        }
+ 
+        bool Collides = false;
+ 
+        for (randomAccess_iterator shapeNode = newshape.begin(); shapeNode != newshape.end(); ++shapeNode)
+        {
+                if (shapeNode->Coordinates.X < 0 || shapeNode->Coordinates.X >= WindowWidth)
+                {
+                        Collides = true;
+                }
+                // Loop trough all shapes, check if we are colliding. If that's the case, the shape has reached its destination, leave it there and generate a new shape
+                typedef vector<vector<GameObject>>::const_iterator it;
+                // Since the active shape is always the last, loop until before the active shape, otherwise we'll detect false collision
+                for (it shape = shapes.begin(); shape != shapes.end() - 1; ++shape)
+                {
+                        for (const_iterator shapePoint = shape->begin(); shapePoint != shape->end(); ++shapePoint)
+                        {
+                                if (shapePoint->Coordinates.X == shapeNode->Coordinates.X && shapePoint->Coordinates.Y == shapeNode->Coordinates.Y)
+                                {
+                                        Collides = true;
+                                        break;
+                                }
+                        }
+                        // This might go in the loop condition, but I believe it's much clear here
+                        if (Collides)
+                                break;
+                }
+        }
+        if (!Collides)
+        {
+                shapes.pop_back();
+                shapes.push_back(newshape);
+        }
+}
+ 
 
 
 void Update()
