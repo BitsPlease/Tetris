@@ -537,7 +537,7 @@ for (int i = 0; i <1209; i++)
 {
 	SetPixel(mydc, ja[i].x -25, ja[i].y + 110, COLOR);
 
-	if (abs(ja[i + 1].x - 25) - abs(ja[i].x - 25) < 1){
+	if ((abs(ja[i ].x - 25) - abs(ja[i+1].x - 25) )> 20){
 		MoveToEx(mydc, ja[i].x - 25, ja[i].y + 110, NULL);
 		LineTo(mydc, ja[i + 1].x - 25, ja[i + 1].y + 110);
 		Sleep(10);
@@ -550,7 +550,8 @@ for (int i = 0; i <1209; i++)
 
 }
 
-HWND myconsole = GetConsoleWindow();
+void sadface(){
+	HWND myconsole = GetConsoleWindow();
 	HDC mydc = GetDC(myconsole);
 
 	COLORREF COLOR = RGB(300, 0, 0);
