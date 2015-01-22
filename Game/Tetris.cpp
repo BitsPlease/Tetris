@@ -236,21 +236,6 @@ void drawPause(){
 
 
 
-typedef vector<GameObject>::iterator randomAccess_iterator;
-typedef vector<GameObject>::const_iterator const_iterator;
-
-// Window constants
-const int WindowWidth = 70;
-const int WindowHeight = 30;
-// Shape
-const int ShapeSpeed = 1;
-const char ShapeSymbol = '*';
-// Game variables
-unsigned long sleepDuration = 200;
-// No need to reference the active shape, since it will always be the last shape in the list
-vector<vector<GameObject>> shapes;
-
-
 void Update()
 {
 	COORD direction = { 0, 0 };
