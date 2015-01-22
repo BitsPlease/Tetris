@@ -972,15 +972,15 @@ void ScoreBoardUpdate(string name, int score)
 
 void core(){//core izpulqnva funkciq na main koito shte bude izvikvan ot pause menu-to
 
+	PlaySound(TEXT("TetrisTheme.wav"), NULL, SND_ASYNC | SND_LOOP | SND_NODEFAULT);
+	soundplay = true;
+	
 	Menu();
 	drawPause();
 	bool gameover = false;
 	consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	// Prepare rand
 	srand(time(NULL));
-
-	PlaySound(TEXT("TetrisTheme.wav"), NULL, SND_ASYNC | SND_LOOP | SND_NODEFAULT);
-	soundplay = true;
 
 	vector<GameObject> floor;
 	for (int i = 0; i < WindowWidth; i++)
