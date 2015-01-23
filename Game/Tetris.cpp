@@ -1185,6 +1185,7 @@ void core(){//core izpulqnva funkciq na main koito shte bude izvikvan ot pause m
 		cout << " Your score is: " << score;
 		quit = true;
 		while (true){
+			Sleep(50);
 			drawPause();
 		}
 
