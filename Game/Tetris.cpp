@@ -179,13 +179,13 @@ void Menu(){//start menu
 	POINT pt;//za mouse coord
 	HWND consoleWindow = GetConsoleWindow();
 	consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	
+
 
 	//4ertaq header
 
 
 	//4ertaq start menu
-	Rect start, instr, back, exit, hed,score,bk;
+	Rect start, instr, back, exit, hed, score, bk;
 	bk.set_values(0, 0, 400, 400, L"");
 	bk.drawblack();
 
@@ -226,8 +226,8 @@ void Menu(){//start menu
 				while (!myReadFile.eof()) {
 					i++;
 					SetConsoleCursorPosition(consoleHandle, { 7, 6 + i });//za pritnvane posredata
-					
-					getline(myReadFile,lines[line]);
+
+					getline(myReadFile, lines[line]);
 					int pos = lines[line].find(":");
 					if (pos >= 1)
 					{
@@ -269,7 +269,7 @@ void Menu(){//start menu
 			exit.drawblack();
 			hed.drawblack();
 			score.drawblack();
-			cout<< "Enter name:";
+			cout << "Enter name:";
 			cin >> setw(10) >> name;
 			break;//sushtkod
 		}
@@ -288,18 +288,18 @@ void Menu(){//start menu
 			exit.drawblack();
 			score.drawblack();
 			SetConsoleCursorPosition(consoleHandle, { 9, 5 });//za pritnvane posredata
- 
- 
-                        cout << "Controls:" << endl;
-                        SetConsoleCursorPosition(consoleHandle, { 5, 8 });
-                        cout << "Use A and D to move." << endl;
-                        SetConsoleCursorPosition(consoleHandle, { 5, 9 });
-                        cout << "Use S to drop." << endl;
-                        SetConsoleCursorPosition(consoleHandle, { 5, 10 });
-                        cout << "Use SPACEBAR to rotate." << endl;
-                        SetConsoleCursorPosition(consoleHandle, { 5, 12 });
-                        cout << " M - Toggle Sound" << endl;
-                        back.set_values(150, 170, 200, 190, L"Back");
+
+
+			cout << "Controls:" << endl;
+			SetConsoleCursorPosition(consoleHandle, { 5, 8 });
+			cout << "Use A and D to move." << endl;
+			SetConsoleCursorPosition(consoleHandle, { 5, 9 });
+			cout << "Use S to drop." << endl;
+			SetConsoleCursorPosition(consoleHandle, { 5, 10 });
+			cout << "Use SPACEBAR to rotate." << endl;
+			SetConsoleCursorPosition(consoleHandle, { 5, 12 });
+			cout << " M - Toggle Sound" << endl;
+			back.set_values(150, 170, 200, 190, L"Back");
 			back.draw();
 			HDC hdc = GetDC(GetConsoleWindow());//magiq
 
@@ -324,28 +324,28 @@ void Menu(){//start menu
 
 void drawPause(){
 
-		Rect  pause,line1, line2,exit;//golqmo zeleno kvadr s 2 4erni ivici
-		pause.set_values(195, 10, 218, 40, L"");
-	
-		line1.set_values(200, 17, 204, 33, L"");
-		
-		line2.set_values(208, 17, 212, 33, L"");
-		if (onepause){
-			pause.draw();
-			line1.drawblackish();
-			line2.drawblackish();
+	Rect  pause, line1, line2, exit;//golqmo zeleno kvadr s 2 4erni ivici
+	pause.set_values(195, 10, 218, 40, L"");
 
-		}
-		
+	line1.set_values(200, 17, 204, 33, L"");
+
+	line2.set_values(208, 17, 212, 33, L"");
+	if (onepause){
+		pause.draw();
+		line1.drawblackish();
+		line2.drawblackish();
+
+	}
+
 	POINT pt;//za mouse coord
 	HWND consoleWindow = GetConsoleWindow();
 	consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	GetCursorPos(&pt);
 	ScreenToClient(consoleWindow, &pt);
-	
+
 	if (GetAsyncKeyState(1) && pt.x > pause.x1 && pt.x < pause.x2&&pt.y<pause.y2&&pt.y>pause.y1){
 		pause.invert();
-		
+
 		presspause();
 		Rect retr, menu;
 		menu.set_values(60, 100, 170, 130, L"Main Menu");
@@ -378,17 +378,21 @@ void drawPause(){
 
 
 			}
-			if (GetAsyncKeyState(1) && pt.x > retr.x1 && pt.x < retr.x2&&pt.y<retr.y2&&pt.y>retr.y1&&quit==false){
+			if (GetAsyncKeyState(1) && pt.x > retr.x1 && pt.x < retr.x2&&pt.y<retr.y2&&pt.y>retr.y1&&quit == false){
 				retr.invert();
 				presspause();
 				menu.drawblack();
 				retr.drawblack();
 				Draw();
+				onepause = true;
+				pause.draw();
+				line1.drawblackish();
+				line2.drawblackish();
 				break;
 			}
 			if (quit == true){//nameri
 
-				
+
 				if (GetAsyncKeyState(1) && pt.x>exit.x1 && pt.x<exit.x2&&pt.y<exit.y2&&pt.y>exit.y1){//lmb down  ...
 					exit.invert();
 					presspause();
@@ -450,6 +454,8 @@ void newShape(bool &gameover)
 	int type = rand() % 7;
 
 	int c = 15;
+	c = rand() % 3 + 4;
+	if (c == 6) c = 7;
 
 
 	switch (type)
@@ -666,17 +672,17 @@ void DelFullRow(int row)
 
 	/*for (int i = row - 1; i > 0; i--)
 	{
-		for (int j = 0; j < WindowWidth; j++)
-		{
-			for (int k = 0; k < max; k++)
-			{
+	for (int j = 0; j < WindowWidth; j++)
+	{
+	for (int k = 0; k < max; k++)
+	{
 
-				if (find(vshapes[k].begin(), vshapes[k].end(), GameObject(j, i, ShapeSymbol)) != vshapes[k].end())
-				{
-					replace(vshapes[k].begin(), vshapes[k].end(), GameObject(j, i, ShapeSymbol), GameObject(j, i + 1, ShapeSymbol));
-				}
-			}
-		}
+	if (find(vshapes[k].begin(), vshapes[k].end(), GameObject(j, i, ShapeSymbol)) != vshapes[k].end())
+	{
+	replace(vshapes[k].begin(), vshapes[k].end(), GameObject(j, i, ShapeSymbol), GameObject(j, i + 1, ShapeSymbol));
+	}
+	}
+	}
 	}*/
 
 	for (int i = max - 1; i >= 0; i--)
@@ -1087,7 +1093,7 @@ void core(){//core izpulqnva funkciq na main koito shte bude izvikvan ot pause m
 
 	PlaySound(TEXT("TetrisTheme.wav"), NULL, SND_ASYNC | SND_LOOP | SND_NODEFAULT);
 	soundplay = true;
-	
+
 	Menu();
 	drawPause();
 	bool gameover = false;
@@ -1143,6 +1149,7 @@ void core(){//core izpulqnva funkciq na main koito shte bude izvikvan ot pause m
 			if (fullrefresh)
 			{
 				Draw();
+				onepause = true;
 			}
 			else
 			{
@@ -1156,6 +1163,7 @@ void core(){//core izpulqnva funkciq na main koito shte bude izvikvan ot pause m
 			if (fullrefresh)
 			{
 				Draw();
+				onepause = true;
 			}
 			else
 			{
@@ -1172,14 +1180,14 @@ void core(){//core izpulqnva funkciq na main koito shte bude izvikvan ot pause m
 		ScoreBoardUpdate(name, score);
 		gameovertxt();
 		SetConsoleCursorPosition(consoleHandle, { 10, 13 });//za pritnvane posredata
-		cout << name <<",";
+		cout << name << ",";
 		SetConsoleCursorPosition(consoleHandle, { 4, 14 });
 		cout << " Your score is: " << score;
 		quit = true;
 		while (true){
 			drawPause();
 		}
-		
+
 	}
 }
 
