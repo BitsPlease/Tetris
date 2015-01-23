@@ -839,7 +839,7 @@ void Update(bool &gameover)
 {
 	COORD direction = { 0, 0 };
 
-	char key = '    ';
+	char key = '1';
 
 	while (kbhit())
 	{
@@ -854,7 +854,7 @@ void Update(bool &gameover)
 	case 'd':
 		direction.X = 1;
 		break;
-	case 'w':
+	case ' ':
 		Rotate();
 		break;
 	case 's':
@@ -960,7 +960,7 @@ void UpdateNoDown(bool &gameover)
 {
 	COORD direction = { 0, 0 };
 
-	char key = '    ';
+	char key = '1';
 
 	while (kbhit())
 	{
@@ -975,7 +975,7 @@ void UpdateNoDown(bool &gameover)
 	case 'd':
 		direction.X = 1;
 		break;
-	case 'w':
+	case ' ':
 		Rotate();
 		break;
 	case 's':
