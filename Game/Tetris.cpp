@@ -217,19 +217,30 @@ void Menu(){//start menu
 			SetConsoleCursorPosition(consoleHandle, { 9, 8 });//za pritnvane posredata
 			ifstream myReadFile;
 			myReadFile.open("Scoreboard.txt");
-			char output[100];
+			string lines[10];
+			int line = 0;
 			int i = 0;
+			bool haveScore = false;
 			if (myReadFile.is_open()) {
+				haveScore = true;
 				while (!myReadFile.eof()) {
 					i++;
-					SetConsoleCursorPosition(consoleHandle, { 9, 8+i });//za pritnvane posredata
-					myReadFile >> output;
-					cout << output<<endl;
-
-
+					SetConsoleCursorPosition(consoleHandle, { 7, 6 + i });//za pritnvane posredata
+					
+					getline(myReadFile,lines[line]);
+					int pos = lines[line].find(":");
+					if (pos >= 1)
+					{
+						cout << i << ". " << lines[line].substr(0, pos) << " - " << lines[line].substr(pos + 1);
+					}
+					line++;
 				}
 			}
 			myReadFile.close();
+			if (!haveScore)
+			{
+				cout << "\n\n       No highscore yet...";
+			}
 			back.set_values(150, 170, 200, 190, L"Back");
 			back.draw();
 			HDC hdc = GetDC(GetConsoleWindow());//magiq
@@ -259,7 +270,7 @@ void Menu(){//start menu
 			hed.drawblack();
 			score.drawblack();
 			cout<< "Enter name:";
-			cin>>name;
+			cin >> setw(10) >> name;
 			break;//sushtkod
 		}
 
@@ -1159,8 +1170,10 @@ void core(){//core izpulqnva funkciq na main koito shte bude izvikvan ot pause m
 		sadface();
 		ScoreBoardUpdate(name, score);
 		gameovertxt();
-		SetConsoleCursorPosition(consoleHandle, { 6, 13 });//za pritnvane posredata
-		cout <<name<<" your score is: "<<score;
+		SetConsoleCursorPosition(consoleHandle, { 10, 13 });//za pritnvane posredata
+		cout << name <<",";
+		SetConsoleCursorPosition(consoleHandle, { 4, 14 });
+		cout << " Your score is: " << score;
 		quit = true;
 		while (true){
 			drawPause();
